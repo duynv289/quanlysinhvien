@@ -1,0 +1,12 @@
+<resources>
+    <string name="app_name">quanlysinhvien</string>
+    <string name="studentId">Mã sinh viên : </string>
+    <string name="studentName">Họ tên : </string>
+    <string name="gender">Giới tính : </string>
+    <string name="averageMark">Điểm tổng kết : </string>
+    <string name="male">Nam</string>
+    <string name="female">Nữ</string>
+    <string name="save">Lưu</string>
+    <string name="edit">Sửa</string>
+    <string name="delete">Xóa</string>
+</resources>
