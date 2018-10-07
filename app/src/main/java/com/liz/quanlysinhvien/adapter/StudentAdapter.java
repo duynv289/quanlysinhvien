@@ -5,7 +5,6 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.Button;
-import android.widget.QuickContactBadge;
 import android.widget.TextView;
 
 import com.liz.quanlysinhvien.R;
@@ -22,6 +21,7 @@ public class StudentAdapter extends RecyclerView.Adapter<StudentAdapter.StudentV
     private List<Student> mStudents;
     private OnItemClickListener mListener;
     private int mPostion;
+
     public StudentAdapter(List<Student> mStudents) {
         this.mStudents = mStudents;
     }
@@ -34,7 +34,7 @@ public class StudentAdapter extends RecyclerView.Adapter<StudentAdapter.StudentV
     public StudentViewHolder onCreateViewHolder(ViewGroup parent, int viewType) {
         LayoutInflater inflater = LayoutInflater.from(parent.getContext());
         View view = inflater.inflate(R.layout.item_student, parent, false);
-        return new StudentViewHolder(view,mListener,mStudents);
+        return new StudentViewHolder(view, mListener, mStudents);
     }
 
     @Override
@@ -47,14 +47,19 @@ public class StudentAdapter extends RecyclerView.Adapter<StudentAdapter.StudentV
         return mStudents != null ? mStudents.size() : 0;
     }
 
+    public interface OnItemClickListener {
+        void setOnItemClickListener(List<Student> mStudents, int position, int id);
+    }
+
     static class StudentViewHolder extends RecyclerView.ViewHolder implements View.OnClickListener {
+        private static OnItemClickListener mListener;
+        private static List<Student> mStudents;
         private TextView txtStudentId, txtStudentName, txtGender, txtAverageMark;
         private Button btnEdit, btnDelete;
-        private static OnItemClickListener mListenter;
-        private static List<Student> mStudents;
-        public StudentViewHolder(View itemView,OnItemClickListener listener, List<Student> mList) {
+
+        public StudentViewHolder(View itemView, OnItemClickListener listener, List<Student> mList) {
             super(itemView);
-            mListenter = listener;
+            mListener = listener;
             mStudents = mList;
             txtStudentId = itemView.findViewById(R.id.txtStudentId);
             txtStudentName = itemView.findViewById(R.id.txtStudentName);
@@ -83,15 +88,16 @@ public class StudentAdapter extends RecyclerView.Adapter<StudentAdapter.StudentV
         public void onClick(View view) {
             switch (view.getId()) {
                 case R.id.btnDelete:
-                    if(mListenter != null){
-                        mListenter.setOnItemClickListener(mStudents,getLayoutPosition());
+                    if (mListener != null) {
+                        mListener.setOnItemClickListener(mStudents, getLayoutPosition(), R.id.btnDelete);
+                    }
+                    break;
+                case R.id.btnEdit:
+                    if (mListener != null) {
+                        mListener.setOnItemClickListener(mStudents, getLayoutPosition(), R.id.btnEdit);
                     }
                     break;
             }
         }
-    }
-
-    public interface OnItemClickListener {
-        void setOnItemClickListener(List<Student> mStudents, int position);
     }
 }

@@ -1,10 +1,12 @@
 package com.liz.quanlysinhvien.entity;
 
+import java.io.Serializable;
+
 /**
  * Created by Administrator on 10/7/2018.
  */
 
-public class Student {
+public class Student implements Serializable {
     private String studentId;
     private String studentName;
     private boolean male;
@@ -50,5 +52,15 @@ public class Student {
 
     public void setAverageMark(double averageMark) {
         this.averageMark = averageMark;
+    }
+
+    @Override
+    public String toString() {
+        return "Student{" +
+                "studentId='" + studentId + '\'' +
+                ", studentName='" + studentName + '\'' +
+                ", male=" + male +
+                ", averageMark=" + averageMark +
+                '}';
     }
 }
