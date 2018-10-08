@@ -1,13 +1,18 @@
 package com.liz.quanlysinhvien.fragment;
 
+import android.annotation.SuppressLint;
 import android.os.Bundle;
 import android.support.annotation.Nullable;
 import android.support.v4.app.Fragment;
+import android.support.v4.app.FragmentManager;
 import android.support.v7.widget.RecyclerView;
 import android.view.LayoutInflater;
+import android.view.MotionEvent;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.Toast;
 
+import com.liz.quanlysinhvien.OnDataChangedListener;
 import com.liz.quanlysinhvien.R;
 import com.liz.quanlysinhvien.StudentDB;
 import com.liz.quanlysinhvien.adapter.StudentAdapter;
@@ -19,44 +24,68 @@ import java.util.List;
  * Created by Administrator on 10/7/2018.
  */
 
-public class FragmentStudent extends Fragment implements FragmentEntry.OnDataChangedListener,StudentAdapter.OnItemClickListener{
+public class FragmentStudent extends Fragment implements StudentAdapter.OnItemClickListener, OnDataChangedListener, View.OnTouchListener {
 
-//    private List<Student> mStudents;
     private RecyclerView mRecyclerView;
     private StudentAdapter mStudentAdapter;
     private StudentDB mStudentDB;
-    public static FragmentStudent getNewInstance(){
-        return new FragmentStudent();
-    }
+    public FragmentStudent(){
 
+    }
     @Override
     public void onCreate(@Nullable Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         mStudentDB = new StudentDB(getActivity());
     }
 
-    @Nullable
     @Override
     public View onCreateView(LayoutInflater inflater, @Nullable ViewGroup container, @Nullable Bundle savedInstanceState) {
-        View view = inflater.inflate(R.layout.fragment_list,container,false);
+        View view = inflater.inflate(R.layout.fragment_list, container, false);
         mRecyclerView = view.findViewById(R.id.recycler_view);
+        mRecyclerView.setOnTouchListener(this);
         showStudents();
-        FragmentEntry.getNewInstance().setOnDataChanged(this);
         return view;
     }
-    public void showStudents(){
+
+    public void showStudents() {
         mStudentAdapter = new StudentAdapter(mStudentDB.getAllStudent());
         mStudentAdapter.setOnItemClick(this);
         mRecyclerView.setAdapter(mStudentAdapter);
     }
+
     @Override
-    public void setOnDataChangedListener() {
+    public void setOnItemClickListener(List<Student> mStudents, int position, int id) {
+        switch (id) {
+            case R.id.btnDelete:
+                mStudentDB.deleteStudent(mStudents.get(position));
+                showStudents();
+                break;
+            case R.id.btnEdit:
+                FragmentManager fm = getFragmentManager();
+                DialogFragmentEdit dialog = DialogFragmentEdit.getNewInstance(mStudents.get(position));
+                dialog.show(fm, null);
+                dialog.OnDataChanged(this);
+                break;
+        }
+    }
+
+    @Override
+    public void setOnUpdateListener(Student student) {
+        mStudentDB.editStudent(student);
+        showStudents();
+        Toast.makeText(getActivity(), "Update", Toast.LENGTH_SHORT).show();
+    }
+
+    @Override
+    public void setOnInsertListener(Student student) {
+        Toast.makeText(getActivity(), "Insert", Toast.LENGTH_SHORT).show();
         showStudents();
     }
 
     @Override
-    public void setOnItemClickListener(List<Student> mStudents, int position) {
-        mStudentDB.deleteStudent(mStudents.get(position));
-        showStudents();
+    public boolean onTouch(View v, MotionEvent event) {
+        FragmentEntry fragmentEntry = new FragmentEntry();
+        fragmentEntry.OnDataChanged(this);
+        return true;
     }
 }

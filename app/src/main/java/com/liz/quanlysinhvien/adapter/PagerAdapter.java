@@ -28,10 +28,10 @@ public class PagerAdapter extends FragmentStatePagerAdapter {
         Fragment fragment = null;
         switch (position){
             case INDEX_ZERO:
-                fragment = FragmentEntry.getNewInstance();
+                fragment = new FragmentEntry();
                 break;
             case INDEX_ONE:
-                fragment = FragmentStudent.getNewInstance();
+                fragment = new FragmentStudent();
                 break;
         }
         return fragment;

@@ -3,9 +3,9 @@ package com.liz.quanlysinhvien;
 import android.content.ContentValues;
 import android.content.Context;
 import android.database.Cursor;
-import android.database.SQLException;
 import android.database.sqlite.SQLiteDatabase;
 import android.database.sqlite.SQLiteOpenHelper;
+import android.util.Log;
 import android.widget.Toast;
 
 import com.liz.quanlysinhvien.entity.Student;
@@ -26,7 +26,8 @@ public class StudentDB extends SQLiteOpenHelper {
     private static final String COLUMN_STUDENT_ID = "student_id";
     private static final String COLUMN_GENDER = "gender";
     private static final String COLUMN_MARK = "mark";
-
+    private static final String GENDER_MALE = "Nam";
+    private static final String GENDER_FEMALE = "Nữ";
     private static final int VERSION = 1;
     private Context mContext;
 
@@ -53,37 +54,15 @@ public class StudentDB extends SQLiteOpenHelper {
         onCreate(db);
     }
 
-    public Student getStudentById(String id) {
-        SQLiteDatabase db = this.getReadableDatabase();
-        String sql = "SELECT * FROM " + TABLE_NAME + " WHERE " +
-                COLUMN_STUDENT_ID + " = " +
-                id;
-        Cursor cursor = db.rawQuery(sql, null);
-        if (cursor != null) {
-            cursor.moveToFirst();
-        }
-        String studentId = cursor.getString(1);
-        String studentName = cursor.getString(2);
-        boolean isMale = false;
-        if (cursor.getString(3).equals(R.string.male)) {
-            isMale = true;
-        }
-        Double mark = Double.parseDouble(cursor.getString(4));
-        Student student = new Student(studentId, studentName, isMale, mark);
-        cursor.close();
-        db.close();
-        return student;
-    }
-
     public void addStudent(Student student) {
         SQLiteDatabase db = this.getWritableDatabase();
         ContentValues values = new ContentValues();
         values.put(COLUMN_STUDENT_ID, student.getStudentId());
         values.put(COLUMN_STUDENT_NAME, student.getStudentName());
         if (student.isMale()) {
-            values.put(COLUMN_GENDER, R.string.male);
+            values.put(COLUMN_GENDER, GENDER_MALE);
         } else {
-            values.put(COLUMN_GENDER, R.string.female);
+            values.put(COLUMN_GENDER, GENDER_FEMALE);
         }
         values.put(COLUMN_MARK, student.getAverageMark());
         db.insert(TABLE_NAME, null, values);
@@ -91,18 +70,39 @@ public class StudentDB extends SQLiteOpenHelper {
         db.close();
     }
 
+    public boolean checkIdExists(String id){
+        boolean STATE = false;
+        String selectQuery = "SELECT * FROM "+TABLE_NAME;
+        SQLiteDatabase db = this.getWritableDatabase();
+        Cursor cursor = db.rawQuery(selectQuery,null);
+        cursor.moveToFirst();
+        do{
+            String studentId = cursor.getString(1);
+            if(studentId.equals(id)){
+                STATE = true;
+            }
+        }while (cursor.moveToNext());
+        cursor.close();
+        db.close();
+        return STATE;
+    }
+
     public int editStudent(Student student) {
         SQLiteDatabase db = this.getWritableDatabase();
-        ContentValues values = new ContentValues();
-        values.put(COLUMN_STUDENT_NAME, student.getStudentName());
-        if (student.isMale()) {
-            values.put(COLUMN_GENDER, R.string.male);
-        } else {
-            values.put(COLUMN_GENDER, R.string.female);
+        String id = student.getStudentId();
+        String name = student.getStudentName();
+        String gender;
+        if(student.isMale()){
+            gender = GENDER_MALE;
+        }else{
+            gender = GENDER_FEMALE;
         }
-        values.put(COLUMN_MARK, student.getAverageMark());
-        return db.update(TABLE_NAME, values, COLUMN_STUDENT_ID + " =?",
-                new String[]{String.valueOf(student.getStudentId())});
+        Double mark = student.getAverageMark();
+        ContentValues values = new ContentValues();
+        values.put(COLUMN_STUDENT_NAME,name);
+        values.put(COLUMN_GENDER,gender);
+        values.put(COLUMN_MARK,mark);
+        return db.update(TABLE_NAME,values,COLUMN_STUDENT_ID +"=?",new String[] {id});
     }
 
     public void deleteStudent(Student student) {
@@ -121,7 +121,7 @@ public class StudentDB extends SQLiteOpenHelper {
                 String id = cursor.getString(1);
                 String name = cursor.getString(2);
                 boolean isMale = false;
-                if (cursor.getString(3).equals(R.string.male)) {
+                if (cursor.getString(3).equals(GENDER_MALE)) {
                     isMale = true;
                 }
                 Double mark = Double.parseDouble(cursor.getString(4));
@@ -129,6 +129,7 @@ public class StudentDB extends SQLiteOpenHelper {
                 mStudents.add(student);
             } while (cursor.moveToNext());
         }
+        db.close();
         return mStudents;
     }
 }
