@@ -20,7 +20,6 @@ public class StudentAdapter extends RecyclerView.Adapter<StudentAdapter.StudentV
 
     private List<Student> mStudents;
     private OnItemClickListener mListener;
-    private int mPostion;
 
     public StudentAdapter(List<Student> mStudents) {
         this.mStudents = mStudents;

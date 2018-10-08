@@ -9,6 +9,7 @@ import android.view.ViewGroup;
 import android.widget.Button;
 import android.widget.EditText;
 import android.widget.RadioButton;
+import android.widget.Toast;
 
 import com.liz.quanlysinhvien.OnDataChangedListener;
 import com.liz.quanlysinhvien.R;
@@ -25,13 +26,14 @@ public class FragmentEntry extends Fragment implements View.OnClickListener {
     private EditText edtStudentId, edtName, edtAverageMark;
     private RadioButton radMale, radFemale;
     private StudentDB mStudentDB;
+    private Student student;
     private OnDataChangedListener mListener;
 
-    public static FragmentEntry getNewInstance() {
-        return new FragmentEntry();
+    public FragmentEntry() {
+
     }
 
-    public void setOnDataChanged(OnDataChangedListener listener) {
+    public void OnDataChanged(OnDataChangedListener listener) {
         mListener = listener;
     }
 
@@ -77,8 +79,12 @@ public class FragmentEntry extends Fragment implements View.OnClickListener {
             if (radMale.isChecked()) {
                 isMale = true;
             }
-            Student student = new Student(id, name, isMale, mark);
-            mStudentDB.addStudent(student);
+            if (mStudentDB.checkIdExists(id)) {
+                Toast.makeText(getActivity(), "StudentID is already exists", Toast.LENGTH_SHORT).show();
+            } else {
+                student = new Student(id, name, isMale, mark);
+                mStudentDB.addStudent(student);
+            }
             if (mListener != null) {
                 mListener.setOnInsertListener(student);
             }

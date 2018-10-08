@@ -1,13 +1,16 @@
 package com.liz.quanlysinhvien.fragment;
 
+import android.annotation.SuppressLint;
 import android.os.Bundle;
 import android.support.annotation.Nullable;
 import android.support.v4.app.Fragment;
 import android.support.v4.app.FragmentManager;
 import android.support.v7.widget.RecyclerView;
 import android.view.LayoutInflater;
+import android.view.MotionEvent;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.Toast;
 
 import com.liz.quanlysinhvien.OnDataChangedListener;
 import com.liz.quanlysinhvien.R;
@@ -21,30 +24,26 @@ import java.util.List;
  * Created by Administrator on 10/7/2018.
  */
 
-public class FragmentStudent extends Fragment implements StudentAdapter.OnItemClickListener, OnDataChangedListener {
+public class FragmentStudent extends Fragment implements StudentAdapter.OnItemClickListener, OnDataChangedListener, View.OnTouchListener {
 
-    //    private List<Student> mStudents;
     private RecyclerView mRecyclerView;
     private StudentAdapter mStudentAdapter;
     private StudentDB mStudentDB;
+    public FragmentStudent(){
 
-    public static FragmentStudent getNewInstance() {
-        return new FragmentStudent();
     }
-
     @Override
     public void onCreate(@Nullable Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         mStudentDB = new StudentDB(getActivity());
     }
 
-    @Nullable
     @Override
     public View onCreateView(LayoutInflater inflater, @Nullable ViewGroup container, @Nullable Bundle savedInstanceState) {
         View view = inflater.inflate(R.layout.fragment_list, container, false);
         mRecyclerView = view.findViewById(R.id.recycler_view);
+        mRecyclerView.setOnTouchListener(this);
         showStudents();
-        FragmentEntry.getNewInstance().setOnDataChanged(this);
         return view;
     }
 
@@ -74,10 +73,19 @@ public class FragmentStudent extends Fragment implements StudentAdapter.OnItemCl
     public void setOnUpdateListener(Student student) {
         mStudentDB.editStudent(student);
         showStudents();
+        Toast.makeText(getActivity(), "Update", Toast.LENGTH_SHORT).show();
     }
 
     @Override
     public void setOnInsertListener(Student student) {
+        Toast.makeText(getActivity(), "Insert", Toast.LENGTH_SHORT).show();
         showStudents();
+    }
+
+    @Override
+    public boolean onTouch(View v, MotionEvent event) {
+        FragmentEntry fragmentEntry = new FragmentEntry();
+        fragmentEntry.OnDataChanged(this);
+        return true;
     }
 }
